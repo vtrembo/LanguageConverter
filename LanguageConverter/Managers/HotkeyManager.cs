@@ -13,7 +13,6 @@ namespace LanguageConverter
 
         public const int HotkeyId = 1;
         public const int WM_HOTKEY = 0x0312;
-        public const int VK_F4 = 0x73;
 
         public HotkeyManager()
         {
@@ -25,7 +24,10 @@ namespace LanguageConverter
         public void Initialize()
         {
             windowHandle = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
-            RegisterHotKey(windowHandle, HotkeyManager.HotkeyId, 0, HotkeyManager.VK_F4); // Register F4
+            var storedHotkey = Settings.Default.LastSelectedHotkey;
+
+            RegisterHotKey(windowHandle, HotkeyId, 0, storedHotkey != 0 ? storedHotkey : 0x73);
+
             HwndSource.FromHwnd(windowHandle)?.AddHook(HwndHook);
         }
 
@@ -37,6 +39,19 @@ namespace LanguageConverter
         private void UnregisterHotKey(IntPtr hWnd, int id)
         {
             NativeMethods.UnregisterHotKey(hWnd, id);
+        }
+
+        public void ChangeHotkey(uint newVk)
+        {
+            UnregisterHotKey(windowHandle, HotkeyId);
+            RegisterHotKey(windowHandle, HotkeyId, 0, newVk);
+            SaveLastSelectedHotkey(newVk);
+        }
+
+        private void SaveLastSelectedHotkey(uint hotkey)
+        {
+            Settings.Default.LastSelectedHotkey = hotkey;
+            Settings.Default.Save();
         }
 
         private IntPtr HwndHook(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
