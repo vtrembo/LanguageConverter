@@ -9,15 +9,29 @@ namespace LanguageConverter
 
         public NotifyIconManager()
         {
-            notifyIcon = new NotifyIcon();
+            notifyIcon = new NotifyIcon
+            {
+                Icon = new Icon("Resources/tools.ico"),
+                Visible = true,
+                ContextMenuStrip = new ContextMenuStrip()
+            };
         }
 
-        public void Initialize(EventHandler onExitMenuItemClicked)
+        public void Initialize()
         {
-            notifyIcon.Icon = new Icon("Resources/tools.ico");
-            notifyIcon.Visible = true;
-            notifyIcon.ContextMenuStrip = new ContextMenuStrip();
-            notifyIcon.ContextMenuStrip.Items.Add("Exit", null, onExitMenuItemClicked);
+            AddContextMenuItem("Exit", OnExitMenuItemClicked);
+        }
+
+        public void AddContextMenuItem(string text, EventHandler onClick)
+        {
+            var menuItem = new ToolStripMenuItem(text);
+            menuItem.Click += onClick;
+            notifyIcon.ContextMenuStrip.Items.Add(menuItem);
+        }
+
+        private void OnExitMenuItemClicked(object sender, EventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
         }
 
         public void Dispose()
