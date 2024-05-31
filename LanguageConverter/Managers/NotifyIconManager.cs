@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
-using System.Windows.Media.Animation;
 
 namespace LanguageConverter
 {
@@ -26,6 +25,8 @@ namespace LanguageConverter
             { "F12", 0x7B }
         };
 
+        private ToolStripMenuItem selectedMenuItem;
+
         public NotifyIconManager()
         {
             hotkeyManager = new HotkeyManager();
@@ -44,6 +45,8 @@ namespace LanguageConverter
 
             AddContextMenuItem("Change shortcut", null, CreateShortcutMenuItems());
             AddContextMenuItem("Exit", OnExitMenuItemClicked);
+
+            HighlightCurrentHotkey();
         }
         private ToolStripMenuItem[] CreateShortcutMenuItems()
         {
@@ -56,6 +59,46 @@ namespace LanguageConverter
                 shortcutItems[i] = item;
             }
             return shortcutItems;
+        }
+
+        private void UpdateSelectedMenuItem(ToolStripMenuItem menuItem)
+        {
+            if (selectedMenuItem != null)
+            {
+                selectedMenuItem.Checked = false;
+            }
+            selectedMenuItem = menuItem;
+
+            selectedMenuItem.Checked = true;
+        }
+
+        private void HighlightCurrentHotkey()
+        {
+            var storedHotKey = hotkeyManager.GetStoredHotKey();
+
+            var changeShortcutItem = notifyIcon.ContextMenuStrip.Items.OfType<ToolStripMenuItem>()
+                .FirstOrDefault(item => item.Text == "Change shortcut");
+
+            foreach (ToolStripMenuItem menuItem in changeShortcutItem.DropDownItems)
+            {
+                if (menuItem.Tag is string keyName && keyName == MapHotKeyToHotKeyName(storedHotKey))
+                {
+                    UpdateSelectedMenuItem(menuItem);
+                    break;
+                }
+            }
+        }
+
+        private string MapHotKeyToHotKeyName(uint hotkey)
+        {
+            foreach (var pair in functionKeyMapping)
+            {
+                if (pair.Value == hotkey)
+                {
+                    return  pair.Key;
+                }
+            }
+            return string.Empty;
         }
 
         public void AddContextMenuItem(string text, EventHandler onClick, params ToolStripMenuItem[] subItems)
@@ -83,6 +126,8 @@ namespace LanguageConverter
                 {
                     hotkeyManager.ChangeHotkey(keyCode);
                 }
+
+                HighlightCurrentHotkey();
             }
 
         }

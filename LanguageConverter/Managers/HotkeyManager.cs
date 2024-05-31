@@ -24,7 +24,7 @@ namespace LanguageConverter
         public void Initialize()
         {
             windowHandle = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
-            var storedHotkey = Settings.Default.LastSelectedHotkey;
+            var storedHotkey = GetStoredHotKey();
 
             RegisterHotKey(windowHandle, HotkeyId, 0, storedHotkey != 0 ? storedHotkey : 0x73);
 
@@ -87,6 +87,11 @@ namespace LanguageConverter
 
             // Paste the converted text
             inputSimulator.SendCtrlV();
+        }
+
+        public uint GetStoredHotKey()
+        {
+            return Settings.Default.LastSelectedHotkey;
         }
 
         public void Dispose()
