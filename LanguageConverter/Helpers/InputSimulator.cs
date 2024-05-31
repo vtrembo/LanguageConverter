@@ -11,6 +11,62 @@ namespace LanguageConverter
         [DllImport("user32.dll")]
         private static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs, int cbSize);
 
+        public void SendCtrlA()
+        {
+            INPUT[] inputs = new INPUT[]
+            {
+                new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    u = new InputUnion
+                    {
+                        ki = new KEYBDINPUT
+                        {
+                            wVk = 0x11, // VK_CONTROL
+                            dwFlags = 0
+                        }
+                    }
+                },
+                new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    u = new InputUnion
+                    {
+                        ki = new KEYBDINPUT
+                        {
+                            wVk = 0x41, // VK_A
+                            dwFlags = 0
+                        }
+                    }
+                },
+                new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    u = new InputUnion
+                    {
+                        ki = new KEYBDINPUT
+                        {
+                            wVk = 0x41, // VK_A
+                            dwFlags = KEYEVENTF_KEYUP
+                        }
+                    }
+                },
+                new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    u = new InputUnion
+                    {
+                        ki = new KEYBDINPUT
+                        {
+                            wVk = 0x11, // VK_CONTROL
+                            dwFlags = KEYEVENTF_KEYUP
+                        }
+                    }
+                }
+            };
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+        }
+
         public void SendCtrlC()
         {
             INPUT[] inputs = new INPUT[]

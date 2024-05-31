@@ -5,6 +5,10 @@ namespace LanguageConverter
 {
     public class NotifyIconManager : IDisposable
     {
+        private const string selectAllBeforeConvertingText = "Select all before converting";
+        private const string changeShortcutText = "Change shortcut";
+        private const string exitText = "Exit";
+
         private readonly HotkeyManager hotkeyManager;
 
         private readonly NotifyIcon notifyIcon;
@@ -43,10 +47,12 @@ namespace LanguageConverter
         {
             hotkeyManager.Initialize();
 
-            AddContextMenuItem("Change shortcut", null, CreateShortcutMenuItems());
-            AddContextMenuItem("Exit", OnExitMenuItemClicked);
+            AddContextMenuItem(selectAllBeforeConvertingText, OnSelectAllBeforeConvertingClicked);
+            AddContextMenuItem(changeShortcutText, null, CreateShortcutMenuItems());
+            AddContextMenuItem(exitText, OnExitMenuItemClicked);
 
             HighlightCurrentHotkey();
+            SetSelectAllBeforeConvertingCheckedState();
         }
         private ToolStripMenuItem[] CreateShortcutMenuItems()
         {
@@ -77,7 +83,7 @@ namespace LanguageConverter
             var storedHotKey = hotkeyManager.GetStoredHotKey();
 
             var changeShortcutItem = notifyIcon.ContextMenuStrip.Items.OfType<ToolStripMenuItem>()
-                .FirstOrDefault(item => item.Text == "Change shortcut");
+                .FirstOrDefault(item => item.Text == changeShortcutText);
 
             foreach (ToolStripMenuItem menuItem in changeShortcutItem.DropDownItems)
             {
@@ -95,7 +101,7 @@ namespace LanguageConverter
             {
                 if (pair.Value == hotkey)
                 {
-                    return  pair.Key;
+                    return pair.Key;
                 }
             }
             return string.Empty;
@@ -130,6 +136,31 @@ namespace LanguageConverter
                 HighlightCurrentHotkey();
             }
 
+        }
+
+        private void OnSelectAllBeforeConvertingClicked(object sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem menuItem)
+            {
+                menuItem.Checked = !menuItem.Checked;
+                SaveSelectAllBeforeConvertingSetting(menuItem.Checked);
+            }
+        }
+
+        private void SaveSelectAllBeforeConvertingSetting(bool isChecked)
+        {
+            Settings.Default.SelectAllBeforeConverting = isChecked;
+            Settings.Default.Save();
+        }
+
+        private void SetSelectAllBeforeConvertingCheckedState()
+        {
+            var selectAllItem = notifyIcon.ContextMenuStrip.Items.OfType<ToolStripMenuItem>()
+                .FirstOrDefault(item => item.Text == selectAllBeforeConvertingText);
+            if (selectAllItem != null)
+            {
+                selectAllItem.Checked = Settings.Default.SelectAllBeforeConverting;
+            }
         }
 
         private void OnExitMenuItemClicked(object sender, EventArgs e)

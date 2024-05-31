@@ -5,5 +5,8 @@
     <Setting Name="LastSelectedHotkey" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">115</Value>
     </Setting>
+    <Setting Name="SelectAllBeforeConverting" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

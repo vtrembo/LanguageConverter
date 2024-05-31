@@ -34,5 +34,17 @@ namespace LanguageConverter {
                 this["LastSelectedHotkey"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SelectAllBeforeConverting {
+            get {
+                return ((bool)(this["SelectAllBeforeConverting"]));
+            }
+            set {
+                this["SelectAllBeforeConverting"] = value;
+            }
+        }
     }
 }

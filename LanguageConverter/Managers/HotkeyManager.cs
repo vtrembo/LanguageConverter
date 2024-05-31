@@ -70,6 +70,11 @@ namespace LanguageConverter
 
         private void OnHotKeyPressed()
         {
+            if (Settings.Default.SelectAllBeforeConverting)
+            {
+                inputSimulator.SendCtrlA(); // Select all text
+            }
+
             // Simulate changing the selected text to Ukrainian
             inputSimulator.SendCtrlC(); // Copy the selected text to clipboard
 
