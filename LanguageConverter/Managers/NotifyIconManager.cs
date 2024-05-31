@@ -5,9 +5,13 @@ namespace LanguageConverter
 {
     public class NotifyIconManager : IDisposable
     {
+        private const string selectAllBeforeConvertingToolTip = "Enable this function to automatically convert all text in the text field into Ukrainian language. Disable if you want to convert only selected text.";
         private const string selectAllBeforeConvertingText = "Select all before converting";
+
         private const string changeShortcutText = "Change shortcut";
         private const string exitText = "Exit";
+        private const string launchOnStartupText = "Launch on startup";
+
 
         private readonly HotkeyManager hotkeyManager;
 
@@ -47,10 +51,12 @@ namespace LanguageConverter
         {
             hotkeyManager.Initialize();
 
+            AddContextMenuItem(launchOnStartupText, OnLaunchOnStartupClicked);
             AddContextMenuItem(selectAllBeforeConvertingText, OnSelectAllBeforeConvertingClicked);
             AddContextMenuItem(changeShortcutText, null, CreateShortcutMenuItems());
             AddContextMenuItem(exitText, OnExitMenuItemClicked);
 
+            SetLaunchOnStartupCheckedState();
             HighlightCurrentHotkey();
             SetSelectAllBeforeConvertingCheckedState();
         }
@@ -147,6 +153,32 @@ namespace LanguageConverter
             }
         }
 
+        private void OnLaunchOnStartupClicked(object sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem menuItem)
+            {
+                menuItem.Checked = !menuItem.Checked;
+                SaveLaunchOnStartupSetting(menuItem.Checked);
+                StartupManager.SetStartup(menuItem.Checked);
+            }
+        }
+
+        private void SaveLaunchOnStartupSetting(bool isChecked)
+        {
+            Settings.Default.LaunchOnStartup = isChecked;
+            Settings.Default.Save();
+        }
+
+        private void SetLaunchOnStartupCheckedState()
+        {
+            var launchOnStartupItem = notifyIcon.ContextMenuStrip.Items.OfType<ToolStripMenuItem>()
+                .FirstOrDefault(item => item.Text == launchOnStartupText);
+            if (launchOnStartupItem != null)
+            {
+                launchOnStartupItem.Checked = Settings.Default.LaunchOnStartup;
+            }
+        }
+
         private void SaveSelectAllBeforeConvertingSetting(bool isChecked)
         {
             Settings.Default.SelectAllBeforeConverting = isChecked;
@@ -160,6 +192,7 @@ namespace LanguageConverter
             if (selectAllItem != null)
             {
                 selectAllItem.Checked = Settings.Default.SelectAllBeforeConverting;
+                selectAllItem.ToolTipText = selectAllBeforeConvertingToolTip;
             }
         }
 
