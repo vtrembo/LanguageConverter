@@ -12,7 +12,6 @@ namespace LanguageConverter
         private const string exitText = "Exit";
         private const string launchOnStartupText = "Launch on startup";
 
-
         private readonly HotkeyManager hotkeyManager;
 
         private readonly NotifyIcon notifyIcon;
@@ -41,7 +40,7 @@ namespace LanguageConverter
 
             notifyIcon = new NotifyIcon
             {
-                Icon = new Icon("Resources/tools.ico"),
+                Icon = new Icon("Resources/languageConverter.ico"),
                 Visible = true,
                 ContextMenuStrip = new ContextMenuStrip()
             };
