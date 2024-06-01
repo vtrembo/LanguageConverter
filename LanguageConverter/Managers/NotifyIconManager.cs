@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace LanguageConverter
@@ -40,10 +41,31 @@ namespace LanguageConverter
 
             notifyIcon = new NotifyIcon
             {
-                Icon = new Icon("Resources/languageConverter.ico"),
+                Icon = LoadIcon("languageConverter.ico"),
                 Visible = true,
-                ContextMenuStrip = new ContextMenuStrip()
+                ContextMenuStrip = new ContextMenuStrip(),
+                Text = "Language Converter"
             };
+        }
+
+        private Icon LoadIcon(string resourceName)
+        {
+            // Get the current assembly
+            var assembly = Assembly.GetExecutingAssembly();
+
+            // The correct resource name (adjust this based on ListEmbeddedResources output)
+            var fullResourceName = $"LanguageConverter.Resources.{resourceName}";
+
+            // Load the icon from the embedded resource
+            using (var stream = assembly.GetManifestResourceStream(fullResourceName))
+            {
+                if (stream != null)
+                {
+                    return new Icon(stream);
+                }
+            }
+
+            return null;
         }
 
         public void Initialize()
@@ -59,13 +81,14 @@ namespace LanguageConverter
             HighlightCurrentHotkey();
             SetSelectAllBeforeConvertingCheckedState();
         }
+
         private ToolStripMenuItem[] CreateShortcutMenuItems()
         {
             var shortcutItems = new ToolStripMenuItem[12];
             for (int i = 0; i < 12; i++)
             {
                 var item = new ToolStripMenuItem($"F{i + 1}");
-                item.Tag = $"F{i+1}";
+                item.Tag = $"F{i + 1}";
                 item.Click += OnShortcutMenuItemClicked;
                 shortcutItems[i] = item;
             }
@@ -130,7 +153,6 @@ namespace LanguageConverter
 
         private void OnShortcutMenuItemClicked(object sender, EventArgs e)
         {
-
             if (sender is ToolStripMenuItem menuItem && menuItem.Tag is string keyName)
             {
                 if (functionKeyMapping.TryGetValue(keyName, out uint keyCode))
@@ -140,7 +162,6 @@ namespace LanguageConverter
 
                 HighlightCurrentHotkey();
             }
-
         }
 
         private void OnSelectAllBeforeConvertingClicked(object sender, EventArgs e)
